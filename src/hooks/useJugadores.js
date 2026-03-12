@@ -11,6 +11,7 @@ export function useJugadores() {
     const { data, error } = await supabase
       .from('jugadores')
       .select('*')
+      .order('apellidos', { nullsFirst: false })
       .order('nombre');
     if (error) { setError(error.message); setLoading(false); return; }
     setJugadores(data ?? []);
@@ -40,7 +41,8 @@ export function useJugadores() {
       .single();
     if (error) throw error;
     // Realtime actualizará la lista automáticamente; también lo hacemos local para respuesta inmediata
-    setJugadores(prev => [...prev, data].sort((a, b) => a.nombre.localeCompare(b.nombre)));
+    setJugadores(prev => [...prev, data].sort((a, b) =>
+      (a.apellidos || a.nombre).localeCompare(b.apellidos || b.nombre)));
     return data;
   };
 

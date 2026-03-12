@@ -2,7 +2,7 @@
 // ─── Script: Reimportar Excel FNB a Supabase ──────────────────────────────────
 //
 // Uso:
-//   node scripts/import-fnb.js ruta/al/Portal_de_Clubs.xlsx
+//   node scripts/import-fnb.js "C:\Users\jmeri\Downloads\Portal de Clubs (2).xlsx"
 //
 // Variables de entorno necesarias (.env o exportadas en terminal):
 //   SUPABASE_URL=https://xxxx.supabase.co
@@ -12,7 +12,9 @@
 //   npm install xlsx @supabase/supabase-js dotenv
 //
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
+dotenv.config({ path: '.env.local' });
 import { createRequire } from 'module';
 import { createClient } from '@supabase/supabase-js';
 
@@ -41,11 +43,14 @@ function parseExcel(path) {
   const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
   const hdrs = rows[0].map(h => String(h).trim());
 
+  // Mostrar encabezados detectados para diagnóstico
+  console.log('📋 Encabezados detectados:', hdrs.join(' | '));
+
   const col = (name) => hdrs.findIndex(h => h.toLowerCase().includes(name.toLowerCase()));
   const C = {
     id:   col('Id Partido'),
-    loc:  col('Equipo Local'),
-    vis:  col('Equipo Visitante'),
+    loc:  hdrs.findIndex(h => h.toLowerCase() === 'equipo local'),
+    vis:  hdrs.findIndex(h => h.toLowerCase() === 'equipo visitante'),
     ptsl: hdrs.findIndex(h => h === 'Columna1') > -1 ? hdrs.findIndex(h => h === 'Columna1') : 7,
     ptsv: hdrs.findIndex(h => h === 'Columna3') > -1 ? hdrs.findIndex(h => h === 'Columna3') : 9,
     fec:  col('Fecha Juego'),
@@ -54,13 +59,24 @@ function parseExcel(path) {
     cat:  col('Categoría'),
   };
 
-  const isSC = s => String(s).includes('SAN CERNIN');
+  console.log(`   id=${C.id} loc=${C.loc} vis=${C.vis} fec=${C.fec} ins=${C.ins} com=${C.com} cat=${C.cat}`);
+
+  if (C.id < 0 || C.loc < 0 || C.vis < 0) {
+    console.error('❌ No se encontraron las columnas clave (Id Partido / Equipo Local / Equipo Visitante).');
+    console.error('   Revisa que el Excel es el correcto y que la primera fila contiene los encabezados.');
+    process.exit(1);
+  }
+
+  const isSC = s => String(s).toUpperCase().includes('SAN CERNIN');
   const partidos = [], eqMap = {};
+  let filasSC = 0, filasTotal = 0;
 
   for (const row of rows.slice(1)) {
     const loc = String(row[C.loc] || '').trim();
     const vis = String(row[C.vis] || '').trim();
+    filasTotal++;
     if (!isSC(loc) && !isSC(vis)) continue;
+    filasSC++;
 
     const id = parseInt(row[C.id]);
     if (!id) continue;
@@ -96,22 +112,23 @@ function parseExcel(path) {
       categoria: cat, resultado, equipo_id: key });
   }
 
-  return { partidos, equipos: Object.values(eqMap).map((e, i) => ({ ...e, id: i + 1 })) };
+  console.log(`   Filas leídas: ${filasTotal} · con SAN CERNIN: ${filasSC}`);
+  return { partidos, equipos: Object.values(eqMap) };
 }
 
 async function main() {
   console.log(`📂 Leyendo: ${file}`);
   const { partidos, equipos } = parseExcel(file);
-  console.log(`   ${partidos.length} partidos · ${equipos.length} equipos únicos`);
+  console.log(`   ${partidos.length} partidos · ${equipos.length} equipos únicos\n`);
 
-  console.log('\n🗑  Limpiando tablas...');
+  if (partidos.length === 0) {
+    console.warn('⚠️  No se encontraron partidos de San Cernin. No se modificará nada en la BD.');
+    process.exit(0);
+  }
+
+  // ── Solo borrar y reimportar partidos (NO tocar equipos) ──────────────────
+  console.log('🗑  Limpiando partidos...');
   await supabase.from('partidos').delete().neq('id', 0);
-  await supabase.from('equipos').delete().neq('id', 0);
-
-  console.log('📥 Insertando equipos...');
-  const { error: e1 } = await supabase.from('equipos').insert(equipos);
-  if (e1) throw e1;
-  console.log(`   ✓ ${equipos.length} equipos`);
 
   console.log('📥 Insertando partidos (batches de 500)...');
   for (let i = 0; i < partidos.length; i += 500) {
@@ -119,8 +136,36 @@ async function main() {
     if (error) throw error;
     process.stdout.write(`\r   ✓ ${Math.min(i + 500, partidos.length)} / ${partidos.length}`);
   }
+  console.log('');
 
-  console.log('\n\n✅ Importación completada');
+  // ── Actualizar stats de equipos existentes (sin borrar ni crear nuevos) ───
+  console.log('📊 Actualizando stats de equipos...');
+  let actualizados = 0, noEncontrados = 0;
+  for (const eq of equipos) {
+    const { data } = await supabase
+      .from('equipos')
+      .select('id')
+      .eq('nombre', eq.nombre)
+      .eq('categoria', eq.categoria)
+      .maybeSingle();
+
+    if (data) {
+      await supabase.from('equipos').update({
+        victorias:  eq.victorias,
+        derrotas:   eq.derrotas,
+        pts_favor:  eq.pts_favor,
+        pts_contra: eq.pts_contra,
+        jugados:    eq.jugados,
+      }).eq('id', data.id);
+      actualizados++;
+    } else {
+      console.log(`   ⚠️  Equipo no encontrado en BD: "${eq.nombre}" (${eq.categoria})`);
+      noEncontrados++;
+    }
+  }
+  console.log(`   ✓ ${actualizados} equipos actualizados · ${noEncontrados} no encontrados`);
+
+  console.log('\n✅ Importación completada');
 }
 
 main().catch(err => { console.error('❌', err.message); process.exit(1); });

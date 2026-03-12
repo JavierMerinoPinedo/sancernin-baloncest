@@ -135,9 +135,6 @@ export default function Login() {
               <span style={{ color: T.dim, fontSize: 11 }}>{desc}</span>
             </div>
           ))}
-          <div style={{ color: T.dim, fontSize: 10, marginTop: 8 }}>
-            El rol se configura en user_metadata desde el dashboard de Supabase
-          </div>
         </div>
       </div>
     </div>
