@@ -1,35 +1,37 @@
-// ─── TOKENS DE TEMA — Club Deportivo San Cernin ───────────────────────────────
+// ─── TOKENS DE TEMA GLASSMORPHISM — Club Deportivo San Cernin ─────────────────
 
 export const DARK = {
   blue:       '#3B82F6',
   blueDark:   '#1D4ED8',
   blueLight:  '#93C5FD',
-  blueGlow:   'rgba(59,130,246,0.25)',
-  blueAlpha:  'rgba(59,130,246,0.1)',
-  blueBorder: 'rgba(59,130,246,0.3)',
+  blueGlow:   'rgba(59,130,246,0.35)',
+  blueAlpha:  'rgba(59,130,246,0.12)',
+  blueBorder: 'rgba(59,130,246,0.35)',
 
-  bg:         '#0A0A0F',
-  bgMid:      '#0F0F15',
-  bgSub:      '#141420',
-  card:       '#16161F',
-  cardHover:  '#1C1C28',
-  border:     '#1E1E2E',
-  borderMid:  '#2D2D42',
+  // Fondo sólido para el body (fallback) y gradiente principal
+  bg:         '#060615',
+  bgGrad:     'linear-gradient(135deg, #060615 0%, #0c0e2a 35%, #060615 65%, #0f0620 100%)',
+  bgMid:      'rgba(8,8,22,0.82)',
+  bgSub:      'rgba(255,255,255,0.04)',
+  card:       'rgba(255,255,255,0.05)',
+  cardHover:  'rgba(255,255,255,0.09)',
+  border:     'rgba(255,255,255,0.09)',
+  borderMid:  'rgba(255,255,255,0.16)',
 
-  text:       '#F1F1F6',
-  textSub:    '#A0A0B8',
-  muted:      '#6B6B85',
-  dim:        '#44445A',
+  text:       '#F0F0F8',
+  textSub:    '#A8A8C8',
+  muted:      '#6A6A88',
+  dim:        '#40405A',
   white:      '#FFFFFF',
-  silver:     '#C0C0D0',
+  silver:     '#C0C0D4',
 
   gold:       '#F59E0B',
-  goldAlpha:  'rgba(245,158,11,0.12)',
+  goldAlpha:  'rgba(245,158,11,0.14)',
   green:      '#22C55E',
-  greenAlpha: 'rgba(34,197,94,0.1)',
+  greenAlpha: 'rgba(34,197,94,0.12)',
   orange:     '#F97316',
   red:        '#EF4444',
-  redAlpha:   'rgba(239,68,68,0.1)',
+  redAlpha:   'rgba(239,68,68,0.12)',
 
   catSenior:   '#3B82F6',
   catJunior:   '#06B6D4',
@@ -40,41 +42,47 @@ export const DARK = {
   catBenjamin: '#14B8A6',
   catVeterano: '#6B7280',
 
-  shadow:   '0 1px 3px rgba(0,0,0,0.6)',
-  shadowMd: '0 4px 16px rgba(0,0,0,0.5)',
-  shadowLg: '0 24px 80px rgba(0,0,0,0.7)',
+  shadow:   '0 4px 20px rgba(0,0,0,0.40), inset 0 0 0 1px rgba(255,255,255,0.07)',
+  shadowMd: '0 8px 32px rgba(0,0,0,0.50), inset 0 0 0 1px rgba(255,255,255,0.06)',
+  shadowLg: '0 24px 80px rgba(0,0,0,0.65), 0 0 60px rgba(59,130,246,0.10)',
+
+  // Orbs decorativos (usados en App.jsx y Login.jsx)
+  orb1: 'radial-gradient(circle, rgba(59,130,246,0.22) 0%, transparent 65%)',
+  orb2: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 65%)',
+  orb3: 'radial-gradient(circle, rgba(6,182,212,0.14) 0%, transparent 65%)',
 };
 
 export const LIGHT = {
   blue:       '#2563EB',
   blueDark:   '#1D4ED8',
   blueLight:  '#1D4ED8',
-  blueGlow:   'rgba(37,99,235,0.15)',
-  blueAlpha:  'rgba(37,99,235,0.07)',
-  blueBorder: 'rgba(37,99,235,0.25)',
+  blueGlow:   'rgba(37,99,235,0.20)',
+  blueAlpha:  'rgba(37,99,235,0.09)',
+  blueBorder: 'rgba(37,99,235,0.28)',
 
-  bg:         '#F0F0F5',
-  bgMid:      '#FFFFFF',
-  bgSub:      '#F7F7FB',
-  card:       '#FFFFFF',
-  cardHover:  '#F5F5FA',
-  border:     '#E2E2EC',
-  borderMid:  '#CDCDD8',
+  bg:         '#b8cef5',
+  bgGrad:     'linear-gradient(135deg, #bdd0f8 0%, #d8e5ff 35%, #e5d6f8 65%, #cce5f8 100%)',
+  bgMid:      'rgba(255,255,255,0.78)',
+  bgSub:      'rgba(255,255,255,0.52)',
+  card:       'rgba(255,255,255,0.65)',
+  cardHover:  'rgba(255,255,255,0.82)',
+  border:     'rgba(255,255,255,0.78)',
+  borderMid:  'rgba(200,218,255,0.88)',
 
-  text:       '#0A0A15',
-  textSub:    '#44445A',
-  muted:      '#6B6B85',
-  dim:        '#A0A0B8',
+  text:       '#0A0A18',
+  textSub:    '#3A3A58',
+  muted:      '#606080',
+  dim:        '#9898B8',
   white:      '#FFFFFF',
-  silver:     '#6B6B85',
+  silver:     '#606080',
 
   gold:       '#D97706',
-  goldAlpha:  'rgba(217,119,6,0.1)',
+  goldAlpha:  'rgba(217,119,6,0.12)',
   green:      '#16A34A',
-  greenAlpha: 'rgba(22,163,74,0.07)',
+  greenAlpha: 'rgba(22,163,74,0.10)',
   orange:     '#EA580C',
   red:        '#DC2626',
-  redAlpha:   'rgba(220,38,38,0.07)',
+  redAlpha:   'rgba(220,38,38,0.10)',
 
   catSenior:   '#2563EB',
   catJunior:   '#0891B2',
@@ -85,9 +93,13 @@ export const LIGHT = {
   catBenjamin: '#0D9488',
   catVeterano: '#6B7280',
 
-  shadow:   '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05)',
-  shadowMd: '0 4px 16px rgba(0,0,0,0.08)',
-  shadowLg: '0 24px 80px rgba(0,0,0,0.14)',
+  shadow:   '0 4px 20px rgba(31,38,135,0.12), inset 0 0 0 1px rgba(255,255,255,0.85)',
+  shadowMd: '0 8px 32px rgba(31,38,135,0.16), inset 0 0 0 1px rgba(255,255,255,0.75)',
+  shadowLg: '0 24px 64px rgba(31,38,135,0.22)',
+
+  orb1: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 65%)',
+  orb2: 'radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 65%)',
+  orb3: 'radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 65%)',
 };
 
 export const catColor = (cat = '', T = DARK) => {
@@ -114,6 +126,4 @@ export const fmtDate = (d = '') => {
 
 export const TODAY = new Date().toISOString().split('T')[0];
 
-// Exportación de compatibilidad — las páginas que aún usen C directamente
-// recibirán DARK como fallback. Migrar a useTheme().T progresivamente.
 export const C = DARK;

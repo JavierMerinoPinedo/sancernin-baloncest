@@ -1,4 +1,5 @@
 import { useTheme } from '../ThemeContext.jsx';
+import { useAuth } from '../AuthContext.jsx';
 import { Ico, ThemeToggle } from './ui.jsx';
 
 const NAV = [
@@ -11,11 +12,13 @@ const NAV = [
 
 export default function Sidebar({ page, setPage, pendientes = 0 }) {
   const { T, dark } = useTheme();
+  const { user, role, logout } = useAuth();
 
   return (
     <aside style={{
       width: 230, flexShrink: 0,
       background: T.bgMid,
+      backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
       borderRight: `1px solid ${T.border}`,
       display: 'flex', flexDirection: 'column',
       position: 'sticky', top: 0, height: '100vh',
@@ -108,9 +111,46 @@ export default function Sidebar({ page, setPage, pendientes = 0 }) {
 
       {/* Footer */}
       <div style={{ padding: '14px 16px', borderTop: `1px solid ${T.border}` }}>
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 10 }}>
           <ThemeToggle />
         </div>
+
+        {/* Usuario activo */}
+        {user && (
+          <div style={{
+            background: T.bgSub, border: `1px solid ${T.border}`,
+            borderRadius: 10, padding: '10px 12px', marginBottom: 10,
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <div style={{
+              width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+              background: role === 'admin' ? `${T.gold}22` : T.blueAlpha,
+              border: `1px solid ${role === 'admin' ? `${T.gold}35` : T.blueBorder}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 14,
+            }}>
+              {role === 'admin' ? '👑' : role === 'entrenador' ? '🏀' : '👁'}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ color: T.text, fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {user.email?.split('@')[0]}
+              </div>
+              <div style={{ color: T.dim, fontSize: 10 }}>{role}</div>
+            </div>
+            <button
+              onClick={logout}
+              title="Cerrar sesión"
+              style={{
+                background: 'transparent', border: 'none',
+                color: T.muted, cursor: 'pointer', display: 'flex',
+                padding: 4, borderRadius: 6, transition: 'color .15s',
+              }}
+            >
+              <Ico n="logout" s={14} />
+            </button>
+          </div>
+        )}
+
         <div style={{ color: T.dim, fontSize: 10, lineHeight: 1.7 }}>
           <div style={{ fontWeight: 700, color: T.muted }}>CD San Cernin</div>
           <div>Avda. Barañáin nº3, Pamplona</div>

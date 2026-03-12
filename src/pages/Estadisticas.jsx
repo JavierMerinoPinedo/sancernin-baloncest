@@ -1,3 +1,8 @@
+import { useMemo } from 'react';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  CartesianGrid, Legend,
+} from 'recharts';
 import { useTheme } from '../ThemeContext.jsx';
 import { cleanCat, fmtDate, catColor } from '../theme.js';
 import { usePartidos, getSC, getRival, getResult, isSC } from '../hooks/usePartidos.js';
@@ -5,10 +10,44 @@ import { useEquipos } from '../hooks/useEquipos.js';
 import { KPI, Card, CardHead, ProgressBar } from '../components/ui.jsx';
 import { Spinner, ErrorBanner } from '../components/LoadingState.jsx';
 
+function CustomTooltip({ active, payload, label, T }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: T.card, border: `1px solid ${T.borderMid}`,
+      borderRadius: 10, padding: '10px 14px', boxShadow: T.shadowMd, fontSize: 12,
+    }}>
+      <div style={{ color: T.text, fontWeight: 700, marginBottom: 6 }}>{label}</div>
+      {payload.map(p => (
+        <div key={p.dataKey} style={{ color: p.color, fontWeight: 700, marginBottom: 2 }}>
+          {p.name}: {p.value}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Estadisticas() {
   const { T } = useTheme();
   const { jugados, victorias, pct, ptsFavor, ptsContra, loading: lp, error: ep } = usePartidos();
   const { equipos, loading: le, error: ee } = useEquipos();
+
+  // Evolución mensual
+  const monthlyData = useMemo(() => {
+    const map = {};
+    jugados.forEach(p => {
+      const m = p.fecha.slice(0, 7);
+      if (!map[m]) map[m] = { mes: m, V: 0, D: 0 };
+      if (getResult(p)?.win) map[m].V++;
+      else map[m].D++;
+    });
+    return Object.values(map)
+      .sort((a, b) => a.mes.localeCompare(b.mes))
+      .map(d => ({
+        ...d,
+        label: new Date(d.mes + '-15').toLocaleDateString('es', { month: 'short', year: '2-digit' }),
+      }));
+  }, [jugados]);
 
   if (lp || le) return <Spinner />;
   if (ep || ee) return <ErrorBanner message={ep || ee} />;
@@ -37,6 +76,15 @@ export default function Estadisticas() {
     .map(e => ({ ...e, pctV: Math.round(e.victorias / e.jugados * 100), avg: Math.round(e.pts_favor / e.jugados) }))
     .sort((a, b) => b.pctV - a.pctV);
 
+  // Por categoría (gráfico)
+  const catChartData = catList.slice(0, 8).map(c => ({
+    name: cleanCat(c.cat)
+      .replace(/masculino/gi, '').replace(/femenino/gi, 'F')
+      .trim().slice(0, 12),
+    Victorias: c.v,
+    Derrotas:  c.d,
+  }));
+
   return (
     <div>
       <div style={{ marginBottom: 22 }}>
@@ -50,6 +98,57 @@ export default function Estadisticas() {
         <KPI label="Pts favor/p."  value={(ptsFavor  / jugados.length).toFixed(1)} color={T.gold}   icon="bar" sub="promedio" />
         <KPI label="Pts contra/p." value={(ptsContra / jugados.length).toFixed(1)} color={T.orange} icon="bar" sub="promedio" />
         <KPI label="Dif. total"    value={`${ptsFavor-ptsContra>0?'+':''}${ptsFavor-ptsContra}`} color={ptsFavor>ptsContra?T.green:T.red} icon="bar" />
+      </div>
+
+      {/* Gráficos */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 18 }}>
+        <Card>
+          <CardHead title="Evolución mensual" sub="victorias y derrotas por mes" />
+          <div style={{ padding: '16px 22px 22px' }}>
+            {monthlyData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={monthlyData} barGap={2}
+                  margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={T.border} vertical={false} />
+                  <XAxis dataKey="label" tick={{ fill: T.muted, fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: T.muted, fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip content={props => <CustomTooltip {...props} T={T} />} cursor={{ fill: `${T.border}80` }} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: T.muted, paddingTop: 8 }} />
+                  <Bar dataKey="V" name="Victorias" fill={T.green} radius={[4,4,0,0]} maxBarSize={28} />
+                  <Bar dataKey="D" name="Derrotas"  fill={T.red}   radius={[4,4,0,0]} maxBarSize={28} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.dim, fontSize: 13 }}>
+                Sin datos suficientes
+              </div>
+            )}
+          </div>
+        </Card>
+
+        <Card>
+          <CardHead title="Victorias por categoría" sub="top 8 categorías" />
+          <div style={{ padding: '16px 22px 22px' }}>
+            {catChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={catChartData} layout="vertical"
+                  margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={T.border} horizontal={false} />
+                  <XAxis type="number" tick={{ fill: T.muted, fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <YAxis dataKey="name" type="category" tick={{ fill: T.muted, fontSize: 9 }} axisLine={false} tickLine={false} width={72} />
+                  <Tooltip content={props => <CustomTooltip {...props} T={T} />} cursor={{ fill: `${T.border}80` }} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: T.muted, paddingTop: 8 }} />
+                  <Bar dataKey="Victorias" fill={T.green} radius={[0,4,4,0]} maxBarSize={20} />
+                  <Bar dataKey="Derrotas"  fill={T.red}   radius={[0,4,4,0]} maxBarSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.dim, fontSize: 13 }}>
+                Sin datos suficientes
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 18 }}>

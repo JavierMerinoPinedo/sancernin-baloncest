@@ -20,7 +20,10 @@ export const Ico = ({ n, s = 18, color }) => {
     check:   'M20 6L9 17l-5-5',
     sun:     'M12 1v2 M12 21v2 M4.22 4.22l1.42 1.42 M18.36 18.36l1.42 1.42 M1 12h2 M21 12h2 M4.22 19.78l1.42-1.42 M18.36 5.64l1.42-1.42 M12 5a7 7 0 1 0 0 14A7 7 0 0 0 12 5z',
     moon:    'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z',
-    pin:     'M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6',
+    pin:      'M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6',
+    bell:     'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0',
+    download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3',
+    logout:   'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
   };
   return (
     <svg width={s} height={s} viewBox="0 0 24 24" fill="none"
@@ -112,6 +115,7 @@ export const Card = ({ children, style: sx = {} }) => {
     <div style={{
       background: T.card, border: `1px solid ${T.border}`,
       borderRadius: 14, boxShadow: T.shadow,
+      backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
       transition: 'background .25s, border-color .25s',
       ...sx,
     }}>{children}</div>
@@ -143,7 +147,8 @@ export const KPI = ({ label, value, sub, color, icon }) => {
     <div style={{
       background: T.card, border: `1px solid ${T.border}`, borderRadius: 14,
       padding: '20px 22px', position: 'relative', overflow: 'hidden',
-      boxShadow: T.shadow, transition: 'background .25s, border-color .25s',
+      boxShadow: T.shadow, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+      transition: 'background .25s, border-color .25s',
     }}>
       <div style={{ position: 'absolute', right: 14, top: 12, color: c, opacity: 0.07 }}>
         <Ico n={icon} s={54} />
@@ -166,6 +171,7 @@ export const Modal = ({ title, sub, onClose, children }) => {
     }}>
       <div style={{
         background: T.card, border: `1px solid ${T.borderMid}`,
+        backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
         borderRadius: 18, width: '100%', maxWidth: 500,
         maxHeight: '92vh', overflowY: 'auto', boxShadow: T.shadowLg,
       }}>
@@ -249,10 +255,18 @@ export const Table = ({ headers, children }) => {
   );
 };
 
-export const TR = ({ children, i }) => {
+export const TR = ({ children, i, onClick }) => {
   const { T } = useTheme();
   return (
-    <tr style={{ borderBottom: `1px solid ${T.border}`, background: i % 2 !== 0 ? T.bgSub : 'transparent', transition: 'background .1s' }}>
+    <tr
+      onClick={onClick}
+      style={{
+        borderBottom: `1px solid ${T.border}`,
+        background: i % 2 !== 0 ? T.bgSub : 'transparent',
+        transition: 'background .1s',
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
       {children}
     </tr>
   );
@@ -266,7 +280,7 @@ export const TD = ({ children, style: sx = {} }) => (
 export const SearchBar = ({ value, onChange, placeholder }) => {
   const { T } = useTheme();
   return (
-    <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 9, flex: '1 1 200px', boxShadow: T.shadow }}>
+    <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 9, flex: '1 1 200px', boxShadow: T.shadow, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
       <span style={{ color: T.muted, display: 'flex' }}><Ico n="search" s={14} /></span>
       <input value={value} onChange={onChange} placeholder={placeholder}
         style={{ background: 'none', border: 'none', color: T.text, fontSize: 13, outline: 'none', flex: 1, fontFamily: 'inherit' }} />

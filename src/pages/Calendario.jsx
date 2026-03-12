@@ -1,23 +1,48 @@
 import { useState, useMemo } from 'react';
+import * as XLSX from 'xlsx';
 import { useTheme } from '../ThemeContext.jsx';
 import { cleanCat, fmtDate, catColor, TODAY } from '../theme.js';
 import { usePartidos, getSC, getRival, getTipo, getResult } from '../hooks/usePartidos.js';
 import { useEquipos } from '../hooks/useEquipos.js';
-import { Card, Badge, Pill, Btn, Ico, Table, TR, TD, SearchBar } from '../components/ui.jsx';
+import { Card, Badge, Pill, Btn, Ico, Table, TR, TD, SearchBar, Modal } from '../components/ui.jsx';
 import { Spinner, ErrorBanner } from '../components/LoadingState.jsx';
 
 const PER_PAGE = 25;
+
+function exportarCalendario(partidos, filtro = '') {
+  const rows = partidos.map(p => {
+    const res = getResult(p);
+    return {
+      Fecha: fmtDate(p.fecha),
+      Hora: p.hora_tbd ? 'TBD' : (p.hora?.slice(0, 5) ?? ''),
+      'Equipo SC': getSC(p),
+      Rival: getRival(p),
+      Tipo: getTipo(p),
+      Categoría: cleanCat(p.categoria),
+      Competición: p.competicion ?? '',
+      Pabellón: p.instalacion ?? '',
+      Resultado: res ? `${res.sc}–${res.rival}` : 'Pendiente',
+      Victoria: res ? (res.win ? 'Sí' : 'No') : '',
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Calendario');
+  XLSX.writeFile(wb, `Calendario_SanCernin${filtro ? `_${filtro}` : ''}.xlsx`);
+}
 
 export default function Calendario() {
   const { T } = useTheme();
   const { partidos, loading: lp, error: ep } = usePartidos();
   const { equipos,  loading: le, error: ee } = useEquipos();
 
-  const [q,       setQ]       = useState('');
-  const [fEq,     setFEq]     = useState('Todos');
-  const [fCat,    setFCat]    = useState('Todas');
-  const [fEstado, setFEstado] = useState('Todos');
-  const [page,    setPage]    = useState(0);
+  const [q,          setQ]          = useState('');
+  const [fEq,        setFEq]        = useState('Todos');
+  const [fCat,       setFCat]       = useState('Todas');
+  const [fEstado,    setFEstado]    = useState('Todos');
+  const [page,       setPage]       = useState(0);
+  const [selected,   setSelected]   = useState(null); // partido seleccionado para el modal
+
   const reset = () => setPage(0);
 
   const filtered = useMemo(() => {
@@ -75,6 +100,10 @@ export default function Calendario() {
           <div style={{ background: T.blueAlpha, border: `1px solid ${T.blue}30`, borderRadius: 8, padding: '6px 14px', color: T.blue, fontSize: 11, fontWeight: 700 }}>
             ⏳ {partidos.filter(p => !p.resultado).length} pendientes
           </div>
+          {/* Botón exportar */}
+          <Btn ghost small icon="download" onClick={() => exportarCalendario(filtered, fEq !== 'Todos' ? fEq : fCat !== 'Todas' ? fCat : '')}>
+            Exportar Excel
+          </Btn>
         </div>
       </div>
 
@@ -101,7 +130,7 @@ export default function Calendario() {
             const res  = getResult(p);
             const cc   = catColor(p.categoria, T);
             return (
-              <TR key={p.id} i={i}>
+              <TR key={p.id} i={i} onClick={() => setSelected(p)}>
                 <TD style={{ color: T.text, fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>{fmtDate(p.fecha)}</TD>
                 <TD style={{ color: p.hora_tbd ? T.dim : T.muted, fontSize: 12 }}>{p.hora_tbd ? '—' : p.hora?.slice(0,5)}</TD>
                 <TD style={{ color: T.gold, fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap' }}>{getSC(p)}</TD>
@@ -128,6 +157,80 @@ export default function Calendario() {
           </div>
         )}
       </Card>
+
+      {/* Modal detalle de partido */}
+      {selected && <PartidoModal partido={selected} onClose={() => setSelected(null)} />}
     </div>
+  );
+}
+
+function PartidoModal({ partido: p, onClose }) {
+  const { T } = useTheme();
+  const tipo  = getTipo(p);
+  const res   = getResult(p);
+  const cc    = catColor(p.categoria, T);
+
+  const row = (label, val) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', borderBottom: `1px solid ${T.border}` }}>
+      <span style={{ color: T.muted, fontSize: 12, fontWeight: 600 }}>{label}</span>
+      <span style={{ color: T.text, fontSize: 12, fontWeight: 700, textAlign: 'right', maxWidth: '60%' }}>{val}</span>
+    </div>
+  );
+
+  return (
+    <Modal
+      title={`${getSC(p)} vs ${getRival(p)}`}
+      sub={`${fmtDate(p.fecha)} · ${p.hora_tbd ? 'Hora TBD' : p.hora?.slice(0, 5)}`}
+      onClose={onClose}
+    >
+      {/* Resultado destacado */}
+      {res ? (
+        <div style={{
+          background: res.win ? T.greenAlpha : T.redAlpha,
+          border: `1px solid ${res.win ? T.green : T.red}35`,
+          borderRadius: 12, padding: '18px 22px', marginBottom: 20,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div>
+            <div style={{ color: T.muted, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+              Resultado final
+            </div>
+            <div style={{ color: res.win ? T.green : T.red, fontSize: 32, fontWeight: 900, letterSpacing: -1 }}>
+              {res.sc} – {res.rival}
+            </div>
+          </div>
+          <div style={{
+            background: res.win ? T.green : T.red,
+            color: '#fff', fontWeight: 900, fontSize: 16,
+            borderRadius: 10, padding: '8px 18px',
+          }}>
+            {res.win ? 'Victoria' : 'Derrota'}
+          </div>
+        </div>
+      ) : (
+        <div style={{
+          background: T.blueAlpha, border: `1px solid ${T.blueBorder}`,
+          borderRadius: 12, padding: '14px 22px', marginBottom: 20,
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <Ico n="cal" s={18} color={T.blue} />
+          <div>
+            <div style={{ color: T.blue, fontWeight: 800, fontSize: 14 }}>Partido pendiente</div>
+            <div style={{ color: T.muted, fontSize: 12 }}>{fmtDate(p.fecha)} · {p.hora_tbd ? 'Hora por confirmar' : p.hora?.slice(0, 5)}</div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginBottom: 4 }}>
+        {row('Equipo San Cernin', getSC(p))}
+        {row('Rival', getRival(p))}
+        {row('Tipo', <Badge color={tipo === 'Local' ? T.green : T.blue} small>{tipo}</Badge>)}
+        {row('Fecha', fmtDate(p.fecha))}
+        {row('Hora', p.hora_tbd ? 'Por confirmar' : (p.hora?.slice(0, 5) ?? '—'))}
+        {row('Pabellón', p.instalacion || '—')}
+        {row('Competición', p.competicion || '—')}
+        {row('Categoría', <span style={{ color: cc, fontWeight: 700 }}>{cleanCat(p.categoria)}</span>)}
+      </div>
+    </Modal>
   );
 }

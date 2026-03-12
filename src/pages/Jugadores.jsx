@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import * as XLSX from 'xlsx';
 import { useTheme } from '../ThemeContext.jsx';
+import { useAuth } from '../AuthContext.jsx';
 import { cleanCat, catColor } from '../theme.js';
 import { useEquipos } from '../hooks/useEquipos.js';
 import { useJugadores } from '../hooks/useJugadores.js';
@@ -9,8 +11,24 @@ import { Spinner, ErrorBanner } from '../components/LoadingState.jsx';
 const POSICIONES = ['Base','Escolta','Alero','Ala-Pivot','Pivot'];
 const BLANK = { nombre:'', equipo:'', categoria:'', posicion:'Base', dorsal:'', edad:'' };
 
+function exportarJugadores(jugadores) {
+  const rows = jugadores.map(j => ({
+    Dorsal:    j.dorsal ?? '',
+    Nombre:    j.nombre,
+    Equipo:    j.equipo,
+    Categoría: cleanCat(j.categoria || ''),
+    Posición:  j.posicion,
+    Edad:      j.edad ?? '',
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Jugadores');
+  XLSX.writeFile(wb, 'Jugadores_SanCernin.xlsx');
+}
+
 export default function Jugadores() {
   const { T } = useTheme();
+  const { canEdit } = useAuth();
   const { jugadores, loading: lj, error: ej, add, update, remove } = useJugadores();
   const { equipos,   loading: le, error: ee } = useEquipos();
 
@@ -63,7 +81,12 @@ export default function Jugadores() {
           <h2 style={{ color: T.text, fontSize: 24, fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Jugadores</h2>
           <p style={{ color: T.muted, marginTop: 4, fontSize: 13 }}>{jugadores.length} fichas guardadas en Supabase</p>
         </div>
-        <Btn onClick={openAdd} icon="plus">Nuevo Jugador</Btn>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Btn ghost small icon="download" onClick={() => exportarJugadores(filtered)}>
+            Exportar Excel
+          </Btn>
+          {canEdit && <Btn onClick={openAdd} icon="plus">Nuevo Jugador</Btn>}
+        </div>
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -71,7 +94,7 @@ export default function Jugadores() {
       </div>
 
       <Card>
-        <Table headers={['#','Nombre','Equipo','Categoría','Posición','Edad','']}>
+        <Table headers={['#','Nombre','Equipo','Categoría','Posición','Edad', ...(canEdit ? [''] : [])]}>
           {filtered.map((j, i) => {
             const cc = catColor(j.categoria || '', T);
             return (
@@ -82,16 +105,18 @@ export default function Jugadores() {
                 <TD><span style={{ color: cc, fontSize: 11, fontWeight: 700 }}>{cleanCat(j.categoria || '')}</span></TD>
                 <TD><Badge color={T.blue} small>{j.posicion}</Badge></TD>
                 <TD style={{ color: T.muted, fontSize: 12 }}>{j.edad ?? '—'}</TD>
-                <TD>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => openEdit(j)} style={{ background: T.bgSub, border: `1px solid ${T.border}`, borderRadius: 7, color: T.muted, cursor: 'pointer', padding: '5px 7px', display: 'flex' }}>
-                      <Ico n="edit" s={13} />
-                    </button>
-                    <button onClick={() => del(j.id)} style={{ background: T.redAlpha, border: `1px solid ${T.red}30`, borderRadius: 7, color: T.red, cursor: 'pointer', padding: '5px 7px', display: 'flex' }}>
-                      <Ico n="trash" s={13} />
-                    </button>
-                  </div>
-                </TD>
+                {canEdit && (
+                  <TD>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button onClick={() => openEdit(j)} style={{ background: T.bgSub, border: `1px solid ${T.border}`, borderRadius: 7, color: T.muted, cursor: 'pointer', padding: '5px 7px', display: 'flex' }}>
+                        <Ico n="edit" s={13} />
+                      </button>
+                      <button onClick={() => del(j.id)} style={{ background: T.redAlpha, border: `1px solid ${T.red}30`, borderRadius: 7, color: T.red, cursor: 'pointer', padding: '5px 7px', display: 'flex' }}>
+                        <Ico n="trash" s={13} />
+                      </button>
+                    </div>
+                  </TD>
+                )}
               </TR>
             );
           })}

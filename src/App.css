@@ -1,0 +1,75 @@
+/* ─── Glassmorphism Global Styles — San Cernin ──────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 180, 0.35);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 180, 0.55);
+}
+
+/* Selección de texto */
+::selection {
+  background: rgba(59, 130, 246, 0.35);
+  color: #fff;
+}
+
+/* Animación flotante para los orbs */
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -40px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.97); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(-40px, 30px) scale(1.04); }
+  66%       { transform: translate(25px, -30px) scale(0.96); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(20px, 40px) scale(1.06); }
+}
+
+.orb-1 { animation: float1 24s ease-in-out infinite; }
+.orb-2 { animation: float2 28s ease-in-out infinite; }
+.orb-3 { animation: float3 20s ease-in-out infinite; }
+
+/* Glass interactivos — hover en botones, filas de tabla */
+.glass-row:hover {
+  background: rgba(59, 130, 246, 0.07) !important;
+}
+
+/* Pulse badge — Supabase live */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* Shimmer para loading states */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Hover glow en botones primarios */
+button:not([disabled]):active {
+  transform: scale(0.97);
+}
