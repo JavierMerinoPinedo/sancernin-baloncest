@@ -10,6 +10,10 @@ const NAV = [
   { key: 'jugadores',    label: 'Jugadores',     icon: 'users'  },
 ];
 
+const NAV_ADMIN = [
+  { key: 'tareas', label: 'Panel Tareas', icon: 'check' },
+];
+
 export default function Sidebar({ page, setPage, pendientes = 0 }) {
   const { T, dark } = useTheme();
   const { user, role, logout } = useAuth();
@@ -107,6 +111,53 @@ export default function Sidebar({ page, setPage, pendientes = 0 }) {
             </button>
           );
         })}
+
+        {/* Sección Admin */}
+        {role === 'admin' && (
+          <>
+            <div style={{
+              color: T.dim, fontSize: 9, fontWeight: 800,
+              textTransform: 'uppercase', letterSpacing: 1.6,
+              padding: '14px 8px 10px',
+              borderTop: `1px solid ${T.border}`,
+              marginTop: 8,
+            }}>
+              Admin
+            </div>
+            {NAV_ADMIN.map(item => {
+              const active = page === item.key;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setPage(item.key)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 12px', borderRadius: 10, border: 'none',
+                    background: active
+                      ? dark ? `rgba(245,158,11,0.14)` : `rgba(217,119,6,0.10)`
+                      : 'transparent',
+                    color: active ? T.gold : T.muted,
+                    cursor: 'pointer', marginBottom: 2, textAlign: 'left',
+                    fontWeight: active ? 700 : 500, fontSize: 13, fontFamily: 'inherit',
+                    transition: 'all .15s',
+                    outline: 'none',
+                  }}
+                >
+                  <span style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 30, height: 30, borderRadius: 8,
+                    background: active ? T.gold : T.bgSub,
+                    color: active ? '#fff' : T.muted,
+                    transition: 'all .15s', flexShrink: 0,
+                  }}>
+                    <Ico n={item.icon} s={14} />
+                  </span>
+                  <span style={{ flex: 1 }}>{item.label}</span>
+                </button>
+              );
+            })}
+          </>
+        )}
       </nav>
 
       {/* Footer */}
@@ -119,31 +170,48 @@ export default function Sidebar({ page, setPage, pendientes = 0 }) {
         {user && (
           <div style={{
             background: T.bgSub, border: `1px solid ${T.border}`,
-            borderRadius: 10, padding: '10px 12px', marginBottom: 10,
-            display: 'flex', alignItems: 'center', gap: 8,
+            borderRadius: 10, marginBottom: 10,
+            display: 'flex', alignItems: 'center',
+            overflow: 'hidden',
           }}>
-            <div style={{
-              width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-              background: role === 'admin' ? `${T.gold}22` : T.blueAlpha,
-              border: `1px solid ${role === 'admin' ? `${T.gold}35` : T.blueBorder}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14,
-            }}>
-              {role === 'admin' ? '👑' : role === 'entrenador' ? '🏀' : '👁'}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: T.text, fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {user.email?.split('@')[0]}
+            {/* Zona clickable → perfil */}
+            <button
+              onClick={() => setPage('perfil')}
+              title="Mi perfil"
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 12px', background: 'transparent', border: 'none',
+                cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+                transition: 'background .15s',
+                borderRadius: '10px 0 0 10px',
+              }}
+            >
+              <div style={{
+                width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                background: role === 'admin' ? `${T.gold}22` : T.blueAlpha,
+                border: `1px solid ${role === 'admin' ? `${T.gold}35` : T.blueBorder}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 14,
+              }}>
+                {role === 'admin' ? '👑' : role === 'entrenador' ? '🏀' : '👁'}
               </div>
-              <div style={{ color: T.dim, fontSize: 10 }}>{role}</div>
-            </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: T.text, fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {user?.user_metadata?.nombre || user.email?.split('@')[0]}
+                </div>
+                <div style={{ color: T.dim, fontSize: 10 }}>{role}</div>
+              </div>
+            </button>
+
+            {/* Logout */}
             <button
               onClick={logout}
               title="Cerrar sesión"
               style={{
-                background: 'transparent', border: 'none',
+                background: 'transparent', border: 'none', borderLeft: `1px solid ${T.border}`,
                 color: T.muted, cursor: 'pointer', display: 'flex',
-                padding: 4, borderRadius: 6, transition: 'color .15s',
+                padding: '10px 10px', transition: 'color .15s',
+                borderRadius: '0 10px 10px 0',
               }}
             >
               <Ico n="logout" s={14} />

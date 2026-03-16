@@ -11,6 +11,8 @@ import Equipos       from './pages/Equipos.jsx';
 import Calendario    from './pages/Calendario.jsx';
 import Estadisticas  from './pages/Estadisticas.jsx';
 import Jugadores     from './pages/Jugadores.jsx';
+import Tareas        from './pages/Tareas.jsx';
+import Perfil        from './pages/Perfil.jsx';
 import Login         from './pages/Login.jsx';
 import { Spinner }   from './components/LoadingState.jsx';
 
@@ -20,6 +22,8 @@ const PAGE_LABELS = {
   calendario:   'Calendario',
   estadisticas: 'Estadísticas',
   jugadores:    'Jugadores',
+  tareas:       'Panel Tareas',
+  perfil:       'Mi Perfil',
 };
 
 const ORB = {
@@ -48,6 +52,8 @@ export default function App() {
     calendario:   <Calendario />,
     estadisticas: <Estadisticas />,
     jugadores:    <Jugadores />,
+    tareas:       <Tareas />,
+    perfil:       <Perfil />,
   };
 
   const bellColor = permiso === 'granted' ? T.green : permiso === 'denied' ? T.red : T.muted;

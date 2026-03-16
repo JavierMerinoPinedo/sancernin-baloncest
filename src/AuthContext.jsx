@@ -9,8 +9,14 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        // Refrescar el token para garantizar que user_metadata está actualizado
+        const { data } = await supabase.auth.refreshSession();
+        setSession(data.session ?? session);
+      } else {
+        setSession(null);
+      }
       setLoading(false);
     });
 

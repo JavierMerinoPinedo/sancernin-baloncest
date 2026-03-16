@@ -221,7 +221,12 @@ export const Sel = ({ value, onChange, options }) => {
       borderRadius: 9, padding: '9px 13px', color: T.text, fontSize: 13,
       boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit',
     }}>
-      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      {options.map(o => (
+        <option key={o.value} value={o.value}
+          style={{ background: T.bg, color: T.text }}>
+          {o.label}
+        </option>
+      ))}
     </select>
   );
 };
