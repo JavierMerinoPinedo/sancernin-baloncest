@@ -109,10 +109,10 @@ export const Pill = ({ children, active, onClick }) => {
 };
 
 // ── Card ──────────────────────────────────────────────────────────────────────
-export const Card = ({ children, style: sx = {} }) => {
+export const Card = ({ children, className, style: sx = {} }) => {
   const { T } = useTheme();
   return (
-    <div style={{
+    <div className={className} style={{
       background: T.card, border: `1px solid ${T.border}`,
       borderRadius: 14, boxShadow: T.shadow,
       backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
@@ -161,15 +161,15 @@ export const KPI = ({ label, value, sub, color, icon }) => {
 };
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
-export const Modal = ({ title, sub, onClose, children }) => {
+export const Modal = ({ title, sub, onClose, children, className }) => {
   const { T } = useTheme();
   return (
-    <div style={{
+    <div className="app-modal-overlay" style={{
       position: 'fixed', inset: 0, zIndex: 300,
       background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(6px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
     }}>
-      <div style={{
+      <div className={className} style={{
         background: T.card, border: `1px solid ${T.borderMid}`,
         backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
         borderRadius: 18, width: '100%', maxWidth: 500,

@@ -87,10 +87,10 @@ export default function Perfil() {
   const initial     = displayName.charAt(0).toUpperCase();
 
   return (
-    <div style={{ maxWidth: 580, margin: '0 auto' }}>
+    <div className="page-perfil" style={{ maxWidth: 580, margin: '0 auto' }}>
 
       {/* ── Cabecera de perfil ── */}
-      <div style={{
+      <div className="perfil-header" style={{
         display: 'flex', alignItems: 'center', gap: 20,
         marginBottom: 32,
       }}>

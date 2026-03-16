@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { useTheme } from './ThemeContext.jsx';
 import { useAuth } from './AuthContext.jsx';
@@ -33,10 +33,22 @@ const ORB = {
 
 export default function App() {
   const [page, setPage] = useState('dashboard');
-  const { T, dark } = useTheme();
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 980);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { T } = useTheme();
   const { session, loading: authLoading, role } = useAuth();
   const { proximos } = usePartidos();
   const { permiso, soportado, pedirPermiso } = useNotificaciones(proximos);
+
+  useEffect(() => {
+    const onResize = () => {
+      const mobile = window.innerWidth <= 980;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(false);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   if (authLoading) return (
     <div style={{ minHeight: '100vh', background: T.bgGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -58,8 +70,13 @@ export default function App() {
 
   const bellColor = permiso === 'granted' ? T.green : permiso === 'denied' ? T.red : T.muted;
 
+  const changePage = (nextPage) => {
+    setPage(nextPage);
+    if (isMobile) setSidebarOpen(false);
+  };
+
   return (
-    <div style={{
+    <div className="app-shell" style={{
       display: 'flex', minHeight: '100vh',
       background: T.bgGrad,
       fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
@@ -76,11 +93,30 @@ export default function App() {
 
       {/* Contenido con z-index sobre los orbs */}
       <div style={{ display: 'contents' }}>
-        <Sidebar page={page} setPage={setPage} pendientes={proximos.length} />
+        <Sidebar
+          page={page}
+          setPage={changePage}
+          pendientes={proximos.length}
+          isMobile={isMobile}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative', zIndex: 1 }}>
+        {isMobile && sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Cerrar menú"
+            style={{
+              position: 'fixed', inset: 0, zIndex: 30,
+              background: 'rgba(4, 10, 22, 0.55)',
+              border: 'none', cursor: 'pointer',
+            }}
+          />
+        )}
+
+        <div className="app-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative', zIndex: 1 }}>
           {/* Topbar */}
-          <header style={{
+          <header className="app-topbar" style={{
             height: 60, flexShrink: 0,
             background: T.bgMid,
             backdropFilter: 'blur(24px)',
@@ -91,6 +127,28 @@ export default function App() {
             position: 'sticky', top: 0, zIndex: 20,
             transition: 'background .25s, border-color .25s',
           }}>
+            {isMobile && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Abrir menú"
+                style={{
+                  background: T.bgSub,
+                  border: `1px solid ${T.border}`,
+                  borderRadius: 10,
+                  width: 34,
+                  height: 34,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: T.textSub,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                <Ico n="bar" s={14} color={T.textSub} />
+              </button>
+            )}
+
             <div style={{ flex: 1 }}>
               <span style={{
                 fontWeight: 900, fontSize: 17, letterSpacing: -0.5,
@@ -100,12 +158,12 @@ export default function App() {
               }}>
                 {PAGE_LABELS[page]}
               </span>
-              <span style={{ color: T.dim, fontSize: 12, marginLeft: 10 }}>
+              <span className="app-season" style={{ color: T.dim, fontSize: 12, marginLeft: 10 }}>
                 · Temporada 2025/2026
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="app-topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {/* Botón notificaciones */}
               {soportado && (
                 <button
@@ -130,7 +188,7 @@ export default function App() {
               )}
 
               {/* Badge rol */}
-              <div style={{
+              <div className="app-role-badge" style={{
                 background: role === 'admin'
                   ? `${T.gold}18`
                   : role === 'entrenador' ? T.blueAlpha : T.bgSub,
@@ -143,7 +201,7 @@ export default function App() {
                 {role === 'admin' ? '👑 Admin' : role === 'entrenador' ? '🏀 Entrenador' : '👁 Consulta'}
               </div>
 
-              <div style={{
+              <div className="app-section-badge" style={{
                 background: T.blueAlpha,
                 backdropFilter: 'blur(12px)',
                 border: `1px solid ${T.blueBorder}`,
@@ -156,7 +214,7 @@ export default function App() {
           </header>
 
           {/* Contenido */}
-          <main style={{ flex: 1, padding: '28px 32px', overflowY: 'auto' }}>
+          <main className="app-main" style={{ flex: 1, padding: '28px 32px', overflowY: 'auto' }}>
             {PAGES[page]}
           </main>
         </div>

@@ -86,13 +86,13 @@ export default function Estadisticas() {
   }));
 
   return (
-    <div>
+    <div className="page-estadisticas">
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ color: T.text, fontSize: 24, fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Estadísticas</h2>
         <p style={{ color: T.muted, marginTop: 4, fontSize: 13 }}>Basado en {jugados.length} partidos jugados · Temporada 2025/2026</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="kpi-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14, marginBottom: 24 }}>
         <KPI label="Victorias"     value={victorias}   color={T.green}  icon="trophy" sub={`${pct}% ratio`} />
         <KPI label="Derrotas"      value={jugados.length - victorias} color={T.red} icon="ball" />
         <KPI label="Pts favor/p."  value={(ptsFavor  / jugados.length).toFixed(1)} color={T.gold}   icon="bar" sub="promedio" />
@@ -101,7 +101,7 @@ export default function Estadisticas() {
       </div>
 
       {/* Gráficos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 18 }}>
+      <div className="two-col-main" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 18 }}>
         <Card>
           <CardHead title="Evolución mensual" sub="victorias y derrotas por mes" />
           <div style={{ padding: '16px 22px 22px' }}>
@@ -151,7 +151,7 @@ export default function Estadisticas() {
         </Card>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 18 }}>
+      <div className="two-col-main" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 18 }}>
         <Card>
           <CardHead title="🏆 Mayores Victorias" sub="diferencia de puntos" />
           <div style={{ padding: '4px 22px 10px' }}>
@@ -189,9 +189,9 @@ export default function Estadisticas() {
       </div>
 
       {/* Ranking tabla */}
-      <Card style={{ marginBottom: 18 }}>
+      <Card className="stats-ranking-card" style={{ marginBottom: 18 }}>
         <CardHead title="Ranking de Equipos" sub="por porcentaje de victorias" />
-        <div style={{ overflowX: 'auto' }}>
+        <div className="stats-ranking-table" style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: T.bgSub, borderBottom: `2px solid ${T.border}` }}>
@@ -234,7 +234,7 @@ export default function Estadisticas() {
       {/* Por categoría */}
       <Card>
         <CardHead title="Rendimiento por Categoría" sub={`${catList.length} categorías`} />
-        <div style={{ padding: '16px 22px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(215px,1fr))', gap: 10 }}>
+        <div className="stats-cat-grid" style={{ padding: '16px 22px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(215px,1fr))', gap: 10 }}>
           {catList.map(({ cat, v, d, pct: p, total }) => {
             const cc   = catColor(cat, T);
             const pCol = p >= 60 ? T.green : p >= 40 ? T.gold : T.red;

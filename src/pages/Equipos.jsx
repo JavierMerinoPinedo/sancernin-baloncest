@@ -32,8 +32,8 @@ function EquipoDetalle({ eq, partidos, onClose }) {
   const cc  = catColor(eq.categoria, T);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div style={{ background: T.card, border: `1px solid ${T.borderMid}`, borderRadius: 18, width: '100%', maxWidth: 660, maxHeight: '90vh', overflowY: 'auto', boxShadow: T.shadowLg }}>
+    <div className="equipo-detalle-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div className="equipo-detalle-card" style={{ background: T.card, border: `1px solid ${T.borderMid}`, borderRadius: 18, width: '100%', maxWidth: 660, maxHeight: '90vh', overflowY: 'auto', boxShadow: T.shadowLg }}>
         <div style={{ height: 4, background: cc, borderRadius: '18px 18px 0 0' }} />
         <div style={{ padding: '22px 26px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
@@ -44,7 +44,7 @@ function EquipoDetalle({ eq, partidos, onClose }) {
             <Ico n="x" s={16} />
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, padding: '18px 26px', borderBottom: `1px solid ${T.border}` }}>
+        <div className="equipo-detalle-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, padding: '18px 26px', borderBottom: `1px solid ${T.border}` }}>
           {[
             { l: 'Victorias', v: eq.victorias,  c: T.green  },
             { l: 'Derrotas',  v: eq.derrotas,   c: T.red    },
@@ -117,7 +117,7 @@ export default function Equipos() {
   const shown = grp === 'Todos' ? enriched : enriched.filter(e => matchGroup(e.categoria, grp));
 
   return (
-    <div>
+    <div className="page-equipos">
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ color: T.text, fontSize: 24, fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>25 Equipos</h2>
         <p style={{ color: T.muted, marginTop: 4, fontSize: 13 }}>Datos en tiempo real · Temporada 2025/2026</p>
@@ -125,7 +125,7 @@ export default function Equipos() {
       <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
         {CAT_GROUPS.map(g => <Pill key={g} active={grp===g} onClick={()=>setGrp(g)}>{g}</Pill>)}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(295px,1fr))', gap: 14 }}>
+      <div className="equipos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(295px,1fr))', gap: 14 }}>
         {shown.map(e => {
           const cc = catColor(e.categoria, T);
           const pColor = e.pct >= 60 ? T.green : e.pct >= 40 ? T.gold : T.red;

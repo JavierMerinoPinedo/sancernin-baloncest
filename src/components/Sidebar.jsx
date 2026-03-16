@@ -14,23 +14,51 @@ const NAV_ADMIN = [
   { key: 'tareas', label: 'Panel Tareas', icon: 'check' },
 ];
 
-export default function Sidebar({ page, setPage, pendientes = 0 }) {
+export default function Sidebar({ page, setPage, pendientes = 0, isMobile = false, open = false, onClose = () => {} }) {
   const { T, dark } = useTheme();
   const { user, role, logout } = useAuth();
 
   return (
-    <aside style={{
-      width: 230, flexShrink: 0,
+    <aside className="app-sidebar" style={{
+      width: isMobile ? 'min(86vw, 280px)' : 230,
+      flexShrink: 0,
       background: T.bgMid,
       backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
       borderRight: `1px solid ${T.border}`,
       display: 'flex', flexDirection: 'column',
-      position: 'sticky', top: 0, height: '100vh',
-      transition: 'background .25s, border-color .25s',
+      position: isMobile ? 'fixed' : 'sticky',
+      top: 0,
+      left: isMobile ? 0 : 'auto',
+      height: isMobile ? '100dvh' : '100vh',
+      zIndex: isMobile ? 40 : 10,
+      transform: isMobile ? (open ? 'translateX(0)' : 'translateX(-105%)') : 'none',
+      transition: isMobile
+        ? 'transform .22s ease, background .25s, border-color .25s'
+        : 'background .25s, border-color .25s',
     }}>
 
       {/* Logo */}
       <div style={{ padding: '22px 18px 18px', borderBottom: `1px solid ${T.border}` }}>
+        {isMobile && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+            <button
+              onClick={onClose}
+              aria-label="Cerrar menú"
+              style={{
+                background: T.bgSub,
+                border: `1px solid ${T.border}`,
+                borderRadius: 8,
+                color: T.muted,
+                cursor: 'pointer',
+                padding: '5px 7px',
+                display: 'flex',
+              }}
+            >
+              <Ico n="x" s={14} />
+            </button>
+          </div>
+        )}
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 16 }}>
           <div style={{
             width: 42, height: 42, borderRadius: 12, flexShrink: 0,
@@ -205,7 +233,7 @@ export default function Sidebar({ page, setPage, pendientes = 0 }) {
 
             {/* Logout */}
             <button
-              onClick={logout}
+              onClick={() => { logout(); onClose(); }}
               title="Cerrar sesión"
               style={{
                 background: 'transparent', border: 'none', borderLeft: `1px solid ${T.border}`,

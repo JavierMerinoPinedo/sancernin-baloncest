@@ -20,9 +20,9 @@ export default function Dashboard() {
   const ultimos = [...jugados].sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 5);
 
   return (
-    <div>
+    <div className="page-dashboard">
       {/* Hero banner */}
-      <div style={{
+      <div className="hero-banner" style={{
         background: dark
           ? `linear-gradient(135deg, #0F1E4A 0%, #0A0A0F 100%)`
           : `linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #3B82F6 100%)`,
@@ -62,7 +62,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="kpi-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14, marginBottom: 24 }}>
         <KPI label="Equipos"          value={equipos.length}  color={T.blue}  icon="shield" sub="inscritos FNB" />
         <KPI label="Partidos jugados" value={jugados.length}  color={T.text}  icon="ball" />
         <KPI label="Victorias"        value={victorias}       color={T.green} icon="trophy" sub={`${pct}% ratio`} />
@@ -70,7 +70,7 @@ export default function Dashboard() {
         <KPI label="Pts favor/p."     value={jugados.length > 0 ? (ptsFavor / jugados.length).toFixed(1) : '—'} color={T.blue} icon="bar" sub="promedio" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 18, marginBottom: 18 }}>
+      <div className="two-col-main" style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 18, marginBottom: 18 }}>
         {/* Próximos */}
         <Card>
           <CardHead title="Próximos Partidos" sub={`${proximos.length} pendientes`}
@@ -124,7 +124,7 @@ export default function Dashboard() {
       </div>
 
       {/* Últimos resultados */}
-      <Card>
+      <Card className="results-card">
         <CardHead title="Últimos Resultados" sub="5 partidos más recientes" />
         <div style={{ padding: '4px 22px 8px' }}>
           {ultimos.map((p, i) => {

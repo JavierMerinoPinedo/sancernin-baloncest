@@ -353,7 +353,7 @@ export default function Tareas() {
   ];
 
   return (
-    <div>
+    <div className="page-tareas">
       {/* Cabecera */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
@@ -371,20 +371,20 @@ export default function Tareas() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
+      <div className="tareas-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 28 }}>
         {kpis.map(k => (
           <KanbanKPI key={k.key} label={k.label} value={k.count} color={k.color} T={T} />
         ))}
       </div>
 
       {/* Tablero Kanban */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18, alignItems: 'start' }}>
+      <div className="tareas-board" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18, alignItems: 'start' }}>
         {ESTADOS.map((estado, colIdx) => {
           const col      = tareas.filter(t => t.estado === estado.key);
           const isTarget = dragOver === estado.key;
 
           return (
-            <div key={estado.key}>
+            <div className="tareas-col" key={estado.key}>
               {/* Cabecera columna */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8,
@@ -459,6 +459,7 @@ export default function Tareas() {
       {/* ── Modal nueva / editar tarea ─────────────────────────────────────────── */}
       {modal && (
         <Modal
+          className="tareas-modal"
           title={editing ? 'Editar tarea' : 'Nueva tarea'}
           sub={editing ? 'Modifica los campos y guarda.' : 'Rellena los datos de la nueva tarea.'}
           onClose={closeModal}
@@ -483,7 +484,7 @@ export default function Tareas() {
             />
           </Fld>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <Fld label="Estado">
               <Sel value={form.estado} onChange={f('estado')}
                 options={ESTADOS.map(e => ({ value: e.key, label: e.label }))} />
@@ -494,7 +495,7 @@ export default function Tareas() {
             </Fld>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <Fld label="Fecha inicio">
               <Inp type="date" value={form.fecha_inicio} onChange={f('fecha_inicio')} />
             </Fld>

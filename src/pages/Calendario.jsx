@@ -87,13 +87,13 @@ export default function Calendario() {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 22 }}>
+    <div className="page-calendario">
+      <div className="cal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 22 }}>
         <div>
           <h2 style={{ color: T.text, fontSize: 24, fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Calendario FNB</h2>
           <p style={{ color: T.muted, marginTop: 4, fontSize: 13 }}>{filtered.length} partidos · Federación Navarra de Baloncesto</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="cal-header-actions" style={{ display: 'flex', gap: 8 }}>
           <div style={{ background: T.greenAlpha, border: `1px solid ${T.green}30`, borderRadius: 8, padding: '6px 14px', color: T.green, fontSize: 11, fontWeight: 700 }}>
             ✓ {partidos.filter(p => p.resultado).length} jugados
           </div>
@@ -108,7 +108,7 @@ export default function Calendario() {
       </div>
 
       {/* Filtros */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="cal-filters-row" style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <SearchBar value={q} onChange={e => { setQ(e.target.value); reset(); }} placeholder="Rival, pabellón…" />
         <select value={fEq} onChange={e => { setFEq(e.target.value); reset(); }} style={selStyle}>
           {equiposList.map(e => <option key={e} value={e}>{e}</option>)}
@@ -148,7 +148,7 @@ export default function Calendario() {
           })}
         </Table>
         {pages > 1 && (
-          <div style={{ padding: '14px 22px', borderTop: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="cal-pagination" style={{ padding: '14px 22px', borderTop: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: T.muted, fontSize: 12 }}>Página {page+1} de {pages} · {filtered.length} partidos</span>
             <div style={{ display: 'flex', gap: 6 }}>
               <Btn ghost small onClick={() => setPage(p => Math.max(0, p-1))}        disabled={page === 0}>← Anterior</Btn>

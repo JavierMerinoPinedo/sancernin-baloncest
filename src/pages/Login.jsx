@@ -34,7 +34,7 @@ export default function Login() {
   };
 
   return (
-    <div style={{
+    <div className="page-login" style={{
       minHeight: '100vh', background: T.bgGrad, display: 'flex',
       alignItems: 'center', justifyContent: 'center', padding: 24,
       fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
@@ -47,7 +47,7 @@ export default function Login() {
         <div className="orb-3" style={{ ...ORB, top: '55%', right: '40%', width: 360, height: 360, background: T.orb3 }} />
       </div>
 
-      <div style={{
+      <div className="login-card" style={{
         background: T.card, border: `1px solid ${T.borderMid}`,
         backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
         borderRadius: 20, padding: '40px 44px', width: '100%', maxWidth: 420,
@@ -122,7 +122,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{ marginTop: 28, padding: '16px', background: T.bgSub, borderRadius: 10, border: `1px solid ${T.border}` }}>
+        <div className="login-roles" style={{ marginTop: 28, padding: '16px', background: T.bgSub, borderRadius: 10, border: `1px solid ${T.border}` }}>
           <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Roles disponibles</div>
           {[
             { role: 'admin',      color: T.gold,  desc: 'Acceso completo · editar todo' },

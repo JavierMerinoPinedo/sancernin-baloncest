@@ -116,14 +116,14 @@ export default function Jugadores() {
   };
 
   return (
-    <div>
+    <div className="page-jugadores">
       {/* Cabecera */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 22 }}>
+      <div className="jugadores-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 22 }}>
         <div>
           <h2 style={{ color: T.text, fontSize: 24, fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Jugadores</h2>
           <p style={{ color: T.muted, marginTop: 4, fontSize: 13 }}>Total fichas: {jugadores.length}</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="jugadores-actions" style={{ display: 'flex', gap: 8 }}>
           <Btn ghost small icon="download" onClick={() => exportarJugadores(filtered)}>Exportar Excel</Btn>
           {canEdit && <Btn onClick={openAdd} icon="plus">Nuevo Jugador</Btn>}
         </div>
@@ -189,6 +189,7 @@ export default function Jugadores() {
       {/* Modal añadir / editar */}
       {modal && (
         <Modal
+          className="jugadores-modal"
           title={modal === 'add' ? 'Nuevo Jugador' : 'Editar Jugador'}
           sub="Los datos se guardan directamente en Supabase"
           onClose={() => setModal(null)}
@@ -200,7 +201,7 @@ export default function Jugadores() {
           )}
 
           {/* Nombre + Apellidos */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Fld label="Nombre *">
               <Inp value={form.nombre || ''}    onChange={e => set('nombre',    e.target.value)} placeholder="María" />
             </Fld>
@@ -210,7 +211,7 @@ export default function Jugadores() {
           </div>
 
           {/* Email + Móvil */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Fld label="E-Mail">
               <Inp value={form.email || ''} onChange={e => set('email', e.target.value)} type="email" placeholder="jugadora@email.com" />
             </Fld>
@@ -220,7 +221,7 @@ export default function Jugadores() {
           </div>
 
           {/* Fecha Nacimiento + Dorsal */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Fld label="Fecha Nacimiento">
               <Inp value={form.fecha_nacimiento || ''} onChange={e => set('fecha_nacimiento', e.target.value)} type="date" />
             </Fld>
@@ -230,7 +231,7 @@ export default function Jugadores() {
           </div>
 
           {/* Tallas + Reversible */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, alignItems: 'end' }}>
+          <div className="form-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, alignItems: 'end' }}>
             <Fld label="Talla Camiseta">
               <Sel value={form.talla_camiseta || ''} onChange={e => set('talla_camiseta', e.target.value)}
                 options={TALLAS.map(t => ({ value: t, label: t || '—' }))} />
@@ -251,7 +252,7 @@ export default function Jugadores() {
           </div>
 
           {/* Equipo + Categoría */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Fld label="Equipo *">
               <Sel value={form.equipo || ''} onChange={e => set('equipo', e.target.value)}
                 options={[{ value: '', label: 'Seleccionar equipo…' }, ...eqOpts.map(e => ({ value: e, label: e }))]} />
